@@ -1,0 +1,6 @@
+*/build/*
+*/node_modules/*
+**/yarn.lock
+.secret
+.DS_Store
+package-lock.json
