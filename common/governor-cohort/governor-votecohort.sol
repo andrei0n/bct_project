@@ -1,43 +1,41 @@
 pragma solidity ^0.5.0;
 
-import {Governor} from "./governor.sol";
+import {Governor_VoteAny} from "../governor-voteany/governor-voteany.sol";
 
-// VoteAll is a governor that requires all voters to agree to
+// VoteCohort is a governor that requires all voters to agree to
 // - a governor update (and to the new governor)
-// - a database write (and to the data written)
-// - a computation
-contract Governor_VoteAll is Governor {
-    address internal owner;
+// - a logic update (and to the new logic)
+// Anybody can join or leave the voters group
+contract Governor_VoteCohort is Governor_VoteAny {
 
-    // The list of voters, as a mapping so it can be easily checked
-    mapping (address => bool) voters;
-    // The list of votes for each proposal (gov update or database write)
+    constructor(address _proxy, uint percentage) Governor_VoteAny(_proxy) public {
+    }
+
+    // The list of votes for each proposal (gov or logic update)
     mapping (bytes => address[]) voteRegistry;
     // Amount of votes necessary for a proposal to be implemented
     // (currently, this is equivalent to voters.length)
     uint quorum;
     
-    // The constructor initialises the list of voters to only the creator
-    constructor(address _proxy) Governor(_proxy) public {
-        owner = msg.sender;
-        voters[owner] = true;
-        quorum = 1;
+    uint percentage;
+    
+    function modifyVoter(bool canVote) public {
+        modifyVoter(msg.sender, canVote);
     }
-
-    // The owner may add or remove voters. This affects the quorum.
-    function modifyVoter(address voter, bool canVote) 
-             external {
-        require (msg.sender == owner, "Governor: only the owner can add or remove voters");
-        require (voters[voter] != canVote, "Governor: this action has no effect");
-
-        voters[voter] = canVote;
-        if (canVote) {
-            quorum += 1;
-        } else {
+    
+    function modifyVoter(address voter, bool canVote) public {
+        require (voter == msg.sender, "Governor: voters can update it only by theirself. Use modifyVoter(canVote) method");
+        require (voters[voter] == canVote, "Governor: this action has no effect");
+        
+        if (voters[voter]) {
             quorum -= 1;
+        } else {
+            quorum += 1;
         }
+        
+        super.modifyVoter(canVote);
     }
-
+    
     // This is the function voters call to make a new proposal or to vote for it.
     // You can't "un-vote".
     // To vote for logic replacement, use action 0 and set newAddress to the new logic address
@@ -66,15 +64,18 @@ contract Governor_VoteAll is Governor {
         }
         return b;
     }
+    
+    function amountOfVotesForPositiveDecision() view public returns(uint) {
+        return quorum * percentage / 100;
+    }
 
     modifier onlyIfApproved(uint action, address newAddress) {
         require(voters[msg.sender], "Governor: only a voter may do this");
 
         bytes memory key = mapkey(action, msg.sender, newAddress);
-        require(voteRegistry[key].length >= quorum, "Governor: not enough votes for this action");
+        require(voteRegistry[key].length >= amountOfVotesForPositiveDecision(), "Governor: not enough votes for this action");
 
         voteRegistry[key].length = 0;
         _;
     }
-    
 }

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import {IReplaceable} from './common/callproxy.sol';
+import {IReplaceable} from './common/proxy/callproxy.sol';
 
 contract Computer is IReplaceable {
     constructor() public {}

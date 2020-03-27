@@ -8,8 +8,7 @@ interface IProxy {
 }
 
 // The default Governor allows everything.
-// The Permissioned modifier can be overridden to provide more
-// functionality.
+// The Permissioned modifier can be overridden to provide more functionality.
 contract Governor {
     IProxy proxy;
 
