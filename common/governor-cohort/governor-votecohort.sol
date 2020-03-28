@@ -8,7 +8,8 @@ import {Governor_VoteAny} from "../governor-voteany/governor-voteany.sol";
 // Anybody can join or leave the voters group
 contract Governor_VoteCohort is Governor_VoteAny {
 
-    constructor(address _proxy, uint percentage) Governor_VoteAny(_proxy) public {
+    constructor(address _proxy, uint _percentage) Governor_VoteAny(_proxy) public {
+        percentage = _percentage;
     }
 
     // The list of votes for each proposal (gov or logic update)
