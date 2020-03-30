@@ -9,7 +9,7 @@ contract Computer is IReplaceable {
         address indexed _from
     );
 
-    function compute() external {
+    function compute() public {
         // Note, if CallProxy is used, this will emit the proxy's address
         emit Compute(msg.sender);
     }

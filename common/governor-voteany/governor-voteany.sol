@@ -19,4 +19,9 @@ contract Governor_VoteAny is Governor {
         require (voters[msg.sender], "Governor: Only voters may do this");
         _;
     }
+
+    modifier onlyVoter() {
+        require (voters[msg.sender], "Governor: Only voters may do this");
+        _;
+    }
 }

@@ -7,7 +7,7 @@ contract Admined  {
         admins[_admin] = true;
     }
     
-    function modifyAdmin(address admin, bool isAdmin) onlyAdmin()  external {
+    function modifyAdmin(address admin, bool isAdmin) onlyAdmin()  public {
         admins[admin] = isAdmin;
     }
 

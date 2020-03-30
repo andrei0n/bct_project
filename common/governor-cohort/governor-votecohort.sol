@@ -43,10 +43,7 @@ contract Governor_VoteCohort is Governor_VoteAny {
     // To vote for a governor replacement, use action 1 and set newAddress
     // to the new governor's address.
     // Executor should be the address of whoever will execute the action once enough votes are in.
-    function vote(uint action, address executor, address newAddress)
-             external {
-        require(voters[msg.sender], "Governor: you are not a registred voter");
-
+    function vote(uint action, address executor, address newAddress) onlyVoter() public {
         bytes memory key = mapkey(action, executor, newAddress);
 
         for(uint i = 0; i != voteRegistry[key].length; i++) {

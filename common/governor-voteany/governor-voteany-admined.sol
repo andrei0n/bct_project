@@ -13,9 +13,4 @@ contract Governor_VoteAny_Admined is Governor_VoteAny, Admined {
     function modifyVoter(bool canVote) onlyAdmin() public {
         super.modifyVoter(canVote);
     }
-
-    modifier onlyIfApproved(uint, address) {
-        require (voters[msg.sender], "Governor: Only voters may do this");
-        _;
-    }
 }

@@ -13,9 +13,4 @@ contract Governor_VoteAny_Owned is Governor_VoteAny, Owned {
     function modifyVoter(bool canVote) onlyOwner() public {
         super.modifyVoter(canVote);
     }
-
-    modifier onlyIfApproved(uint, address) {
-        require (voters[msg.sender], "Governor: Only voters may do this");
-        _;
-    }
 }
