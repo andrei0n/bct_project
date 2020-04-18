@@ -11,54 +11,36 @@ In each of the use cases in this repository, there is a primary (proxy) contract
 1. A proxy that uses "delegatecall" to forward unknown methods. This means that the call will execute in the context of the proxy contract. This means that any upgrade needs to be compatible with the existing storage layout!
 2. A proxy that uses a regular "call" to forward unknown methods. With this approach the logic contract manages its own storage, which will need to be transfered when the logic code is upgraded. An important downside is that `msg.sender` is set to the proxy contract, making some functionality unfeasible.
 
-In addition, each proxy contract has one or more governor contracts.
-A governor is a contract that controls access to some or all functionality of the proxy contract, such as upgrades of the contract's logic contracts.
+In addition, each proxy contract has one vernor contracts.
+A governor is a contract that controls access to some or all functionality of the proxy contract, such as upgrades of the contract's logic contract.
 In addition, the governor can be asked to replace itself by a new governor (possibly with different access control policies).
-
-If someone wishes to access one of the governed functions of the proxy contract, they must use the corresponding function in the governor contract; the governor will check the policies, and if the request is allowed, it will forward the request to the proxy contract.
 The proxy contract will only allow such requests from the governor, so unauthorized use of these governed functions is prevented.
 
 ## Types of governors
 
-For each use case, we implement a few examples of governor contracts.
+For each use case, we implement some examples of governor contracts.
 These are referred to by common names, which is explained below.
 
-* _Nobody_ will not allow anyone to do anything.
-* _Owner_ will allow only its creator to do everything.
-* _VoteOne_ will allow its creator to add people to a group of valid users (and remove them). Everyone in the group is allowed to do everything.
-* _VoteAll_ is like _VoteOne_, but everyone in the group needs to agree before anything can be done. Proposal and agreement is done via a `vote` function.
-* The above _VoteSomething_ contracts have _NoLeader_ variants, in which the special role of the creator is removed.
-  - _VoteOneNoLeader_ is an anarchy, and should only be used by groups of mutually trusted agents, since anyone can add anyone else to the group (or remove them).
-  - _VoteAllNoLeader_ is meant for un-trusting groups, as the owner can no longer kick out anyone on its own. Voting takes place for any change to the group composition.
-
-## Use cases
-
-These are the use cases currently available.
-
-### Computer
-The computer contract is a simple example: it has a `compute` function, which emits an event.
-We pretend that this function is worthy of protection.
-
-The computer has two governors, which can be changed to any of the available variants independently.
-The *update* governor is allowed to control who gets to replace any of the two governors.
-The *execute* governor is allowed to control who gets to execute the `compute` function.
-
-The computer contract is initialized with an _Owner_ governor as its *update* governor, and a _Nobody_ governor as its *execute* governor.
-We consider this to be the minimal viable set of governors; to actually use the `compute` functionality, a governor update is needed.
-
-### Database
-The database example showcases the possibility of placing also the contract's storage in a different contract, called the `Storage`.
-The primary contract calls into the Storage contract to read and write data, and the Storage contract provides this functionality only to the primary contract.
-
-This allows upgrade of even the proxy without having to recreate the data.
-The database offers a facility, guarded by the *update* governor, to transfer the ownership of the Storage to a new primary contract.
-
-### ERC-20 token
-The token example shows how a standard Ethereum ERC-20 token could be governed by our governor contracts.
-This example has a primary contract acting as a proxy, a secondary contract implementing the ERC-20 interface, and a Storage contract that survives updates of the secondary contract and provides storage of the token database, analogously to the database example above.
-
-Since the ERC-20 standard provides its own functional access control, there is only one governor, which acts as the *update* governor.
-In addition to replacing itself, the governor can replace the ERC-20 token contract, transferring the Storage ownership to the replacement ERC-20 contract.
+* _Governor_ – The default Governor allows everything.
+  * _Governor-Owned_ – The governor where only the owner has the power to make updates.
+  * _Governor-Nobody_ – This governor does not allow anything. Setting it as the update governor will prevent future updates.
+  * _Governor-Admined_ – The governor where only the admin has the power to make updates.
+* _Governor-Any_ renamed from _Governor-VoteOne-NoLeader_ – This is a governor that will let anyone on a list of voters perform the update, and even add or remove people from the group. Anybody can join or leave the voters group.
+  * _Governor-Any-Owned_ renamed from _Governor-VoteOne_ – Same as _Governor-Any_, but here only the Owner can add or remove voters from the group.
+  * _Governor-Any-Admined_ – Same as _Governor-Any_, but here anybody of the admins group can add or remove voters from the group.
+* _Governor-Cohort_ based on _Governor-VoteAll_ – This is a governor that requires a subgroup (can be 100%, initially only 100%) of voters to agree to a governor update (and to the new governor) or a logic update (and to the new logic). Anybody can join or leave the voters group
+  * _Governor-Cohort-Admined_ – Same as _Governor-Cohort_, but here anybody of admins group can add or remove voters from the group.
+  * _Governor-Cohort-Owned_ – Same as _Governor-Cohort_, but here the Owner can add or remove voters from the group.
+  * _Governor-Cohort-Consortium_ based on _Governor-VoteAll-NoLeader_ – This is a governor that requires all voters to agree to a governor update (and to the new governor), a logic update (and to the new logic), the addition of voters or removal of voters (except the one removed).
+    * _Governor-Cohort-Consortium-Mintable_ – Same as _Governor-Cohort-Consortium_, but additional votes can be bought.
+    * _Governor-Cohort-Consortium-Delegate_ – Same as _Governor-Cohort-Consortium_, but vote can be delegated.
+  * _Governor-Cohort-Delegate_ – Same as _Governor-Cohort_, but votes can be delegated to other voters.
+  * _Governor-Cohort-Delegate-Owned_ – Same as _Governor-Cohort-Delegate_, but only the owner can add or remove voters from the group.
+  * _Governor-Cohort-Delegate-Admined_ – Same as _Governor-Cohort-Delegate_, but only admins from the group can add or remove voters.
+* _Governor-Richest_ – This governor gives the entire power to the person that has the most ether donated.
+* _Governor-Mintable_ – Same as _Governor-Cohort_, but additional votes can be bought. 
+  * _Governor-Mintable-Owned_ – Same as _Governor-Mintable_, but only the owner can add or remove voters from the group.
+  * _Governor-Mintable-Admined_ – Same as _Governor-Mintable_, but only admins from the group can add or remove voters.
 
 ## Usage
 
@@ -90,6 +72,4 @@ kill -9 $(jobs -p)
 
 ## Acknowledgements
 
-The code in this repository was developed in the context of the [Techruption programme](https://www.techruption.org/) and a research project by the [Dutch Blockchain Coalition (DBC)](https://dutchblockchaincoalition.org/en).
-
-In addition, this activity is partially funded from the "PPS-toeslag onderzoek en innovatie" from the Dutch Ministry of Economic Affairs and Climate Policy.
+The code in this repository is based on [the project of TNO](https://github.com/TNO/smartcontract-governance-bootstrap)

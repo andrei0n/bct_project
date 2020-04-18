@@ -1,6 +1,6 @@
 // Fetch the Computer contract data
-var Computer = artifacts.require("./Computer");
-var CallProxy = artifacts.require("./CallProxy");
+var Computer = artifacts.require("./Computer") 
+var CallProxy = artifacts.require("./CallProxy") 
 
 // JavaScript export
 module.exports = function(deployer) {
@@ -9,6 +9,6 @@ module.exports = function(deployer) {
 
     // Deploy the contract to the network
     deployer.deploy(Computer).then(function() {
-        return deployer.deploy(CallProxy, Computer.address);
-    });
+        return deployer.deploy(CallProxy, Computer.address) 
+    }) 
 }

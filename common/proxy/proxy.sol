@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import {Governor_Owner} from "./governor-owner.sol";
+import { Governor_Owned } from "../governor/governor-owned.sol";
 
 contract Proxy {
     // We use standard proxy storage slots as specified in EIP-1967
@@ -66,7 +66,7 @@ contract Proxy {
      */
     constructor(address logic) public {
         _setLogic(logic);
-        _setGovernor(address(new Governor_Owner(address(this), msg.sender)));
+        _setGovernor(address(new Governor_Owned(address(this), msg.sender)));
         emit NewMemberContracts(_logic(), _governor());
     }
 

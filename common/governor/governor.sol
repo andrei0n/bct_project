@@ -8,20 +8,19 @@ interface IProxy {
 }
 
 // The default Governor allows everything.
-// The Permissioned modifier can be overridden to provide more
-// functionality.
+// The Permissioned modifier can be overridden to provide more functionality.
 contract Governor {
     IProxy proxy;
 
-    constructor(address _proxy) internal {
+    constructor(address _proxy) public {
         proxy = IProxy(_proxy);
     }
 
-    function updateLogic(address _newLogic) onlyIfApproved(0, _newLogic) external {
+    function updateLogic(address _newLogic) onlyIfApproved(0, _newLogic) public {
         proxy.updateLogic(_newLogic);
     }
 
-    function updateGovernor(address _newGovernor) onlyIfApproved(1, _newGovernor) external {
+    function updateGovernor(address _newGovernor) onlyIfApproved(1, _newGovernor) public {
         proxy.updateGovernor(_newGovernor);
     }
 

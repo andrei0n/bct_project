@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import {Proxy} from "./proxy.sol";
+import { Proxy } from "./proxy.sol";
 
 contract IReplaceable {
-    function beReplaced(address newContract) external {}
+    function beReplaced(address newContract) public {}
 }
 
 /**

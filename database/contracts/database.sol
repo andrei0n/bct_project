@@ -1,7 +1,7 @@
 pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import {IReplaceable} from './common/callproxy.sol';
+import { IReplaceable } from './common/proxy/callproxy.sol';
 
 contract Database is Ownable, IReplaceable {
     Storage databaseStorage;
@@ -22,7 +22,7 @@ contract Database is Ownable, IReplaceable {
 
     // The storage can be transferred to a new Database contract, in case this one is 
     // deemed unfit. The new owner should be passed.
-    function beReplaced(address newOwner) external onlyOwner() {
+    function beReplaced(address newOwner) public onlyOwner() {
         databaseStorage.transferOwnership(newOwner);
         databaseStorage = Storage(0x0);
     }

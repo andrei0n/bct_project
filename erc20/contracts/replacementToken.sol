@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import {ERC20_Token, ERC20_Details, Initializeable} from './erc20.sol';
-import {TokenStorage} from './tokenStorage.sol';
+import { ERC20_Token, ERC20_Details, Initializeable } from './erc20.sol';
+import { TokenStorage } from './tokenStorage.sol';
 
 // This token is intended to replace an existing token (that presumably contains an error).
 // It takes over the existing storage, and therefore does not reallocate the supply to the

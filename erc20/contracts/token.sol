@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import {ERC20_Token, ERC20_Details, Initializeable} from './erc20.sol';
-import {TokenStorage} from './tokenStorage.sol';
+import { ERC20_Token, ERC20_Details, Initializeable } from './erc20.sol';
+import { TokenStorage } from './tokenStorage.sol';
 
 contract GovernedToken is Initializeable, ERC20_Token, ERC20_Details, Ownable {
     uint256 supply;
